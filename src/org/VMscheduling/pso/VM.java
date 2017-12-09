@@ -8,11 +8,14 @@ public class VM{
     // store the Location in an array to accommodate multi-dimensional problem space
     private int id;
     public assigned = false;
-    public double memory = 1000;
-    public double cpu = 1000;
+    public double memmory = 100;
+    public double cpu = 100;
 
-    public void setId(int id){
+    public VM(int id, double memmory = 100, double cpu =100){
         this.id =id;
+        this.memmory =memmory;
+        this.cpu =cpu;
+        this.assigned = true;
     }
 
     public int getId(int id){
