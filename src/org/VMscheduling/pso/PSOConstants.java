@@ -1,4 +1,4 @@
-package org.gandhim.pso;
+package org.VMscheduling.pso;
 
 /* author: gandhi - gandhi.mtm [at] gmail [dot] com - Depok, Indonesia */
 
@@ -12,5 +12,9 @@ public interface PSOConstants {
 	double C1 = 2.0;
 	double C2 = 2.0;
 	double W_UPPERBOUND = 1.0;
+    int NO_OF_PM = 100;
+    int POP = 500;
+    int NO_OF_VM = 100;
+    int SEED = 0;
 	double W_LOWERBOUND = 0.0;
 }
