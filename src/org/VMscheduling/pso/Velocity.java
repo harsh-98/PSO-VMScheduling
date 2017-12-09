@@ -1,23 +1,23 @@
-package org.gandhim.pso;
+package org.VMscheduling.pso;
 
-/* author: gandhi - gandhi.mtm [at] gmail [dot] com - Depok, Indonesia */
+/* author: harsh jain */
 
 // bean class to represent velocity
 
 public class Velocity {
 	// store the Velocity in an array to accommodate multi-dimensional problem space
-	private double[] vel;
+	private boolean[] vel;
 
-	public Velocity(double[] vel) {
+	public Velocity(boolean[] vel) {
 		super();
 		this.vel = vel;
 	}
 
-	public double[] getPos() {
+	public boolean[] getPos() {
 		return vel;
 	}
 
-	public void setPos(double[] vel) {
+	public void setPos(boolean[] vel) {
 		this.vel = vel;
 	}
 	

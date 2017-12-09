@@ -1,23 +1,23 @@
-package org.gandhim.pso;
+package org.VMscheduling.pso;
 
-/* author: gandhi - gandhi.mtm [at] gmail [dot] com - Depok, Indonesia */
+/* author: harsh jain */
 
 // bean class to represent location
 
 public class Location {
 	// store the Location in an array to accommodate multi-dimensional problem space
-	private double[] loc;
+	private boolean[] loc;
 
-	public Location(double[] loc) {
+	public Location(boolean[] loc) {
 		super();
 		this.loc = loc;
 	}
 
-	public double[] getLoc() {
+	public boolean[] getLoc() {
 		return loc;
 	}
 
-	public void setLoc(double[] loc) {
+	public void setLoc(boolean[] loc) {
 		this.loc = loc;
 	}
 	
