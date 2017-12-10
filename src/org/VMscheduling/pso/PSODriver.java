@@ -1,6 +1,6 @@
-package org.gandhim.pso;
+package org.VMscheduling.pso;
 
-/* author: gandhi - gandhi.mtm [at] gmail [dot] com - Depok, Indonesia */
+/* author: harsh jain */
 
 // this is a driver class to execute the PSO process
 

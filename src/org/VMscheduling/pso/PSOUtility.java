@@ -1,21 +1,14 @@
-package org.gandhim.pso;
+package org.VMscheduling.pso;
 
-/* author: gandhi - gandhi.mtm [at] gmail [dot] com - Depok, Indonesia */
+/* author: harsh jain */
 
 // just a simple utility class to find a minimum position on a list
 
 public class PSOUtility {
-	public static int getMinPos(double[] list) {
-		int pos = 0;
-		double minValue = list[0];
-		
-		for(int i=0; i<list.length; i++) {
-			if(list[i] < minValue) {
-				pos = i;
-				minValue = list[i];
-			}
-		}
-		
-		return pos;
+	public double[] ratio(double x, double xl, double xg){
+		double p1 = x/(x + xl + xg);
+		double p2 = xl/(x + xl + xg);
+		double p3 = xg/(x + xl + xg);
+		return {p1, p2, p3};
 	}
 }

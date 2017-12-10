@@ -1,4 +1,6 @@
-package org.gandhim.pso;
+package org.VMscheduling.pso;
+
+/* author: harsh jain */
 
 public class Particle {
 	public boolean feasible =false;
