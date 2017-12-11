@@ -1,10 +1,10 @@
 package org.VMscheduling.pso;
 
 /* author: harsh jain */
-
+import java.io.*;
 import java.lang.Cloneable;
 
-public class Particle implements Cloneable{
+public class Particle implements Serializable{
 	public boolean feasible =false;
 	public Velocity velocity;
 	public Location location;
@@ -15,9 +15,6 @@ public class Particle implements Cloneable{
 		super();
 	}
 
-	public Particle clone()throws CloneNotSupportedException{  
-		return (Particle) super.clone();
-	}
 
 	public Particle(int id, boolean[] velocity, boolean[] location, PM[] pmArray) {
 		super();
@@ -59,6 +56,7 @@ public class Particle implements Cloneable{
 		double [] fit = new double[location.size()];
 		for(int i = 0; i<location.size(); i++){
 			fit[i] = 1-pmArray[i].memmory/pmArray[i].originalMemmory + 1-pmArray[i].cpu/pmArray[i].originalCpu;
+			if(fit[i] == 0)fit[i] = PSOConstants.MIN/(pmArray[i].originalMemmory+pmArray[i].originalCpu);
 		}
 	return fit;
 	}

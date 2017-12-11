@@ -3,8 +3,8 @@ package org.VMscheduling.pso;
 /* author: harsh jain */
 
 // bean class to represent location
-
-public class VM{
+import java.io.*;
+public class VM implements Serializable{
     // store the Location in an array to accommodate multi-dimensional problem space
     public int id;
     public boolean assigned = false;

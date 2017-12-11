@@ -3,8 +3,8 @@ package org.VMscheduling.pso;
 /* author: harsh jain */
 
 // bean class to represent velocity
-
-public class Velocity {
+import java.io.*;
+public class Velocity implements Serializable{
 	// store the Velocity in an array to accommodate multi-dimensional problem space
 	private boolean[] vel;
 

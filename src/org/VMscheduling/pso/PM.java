@@ -5,8 +5,8 @@ package org.VMscheduling.pso;
 // bean class to represent location
 
 import java.util.Vector;
-
-public class PM{
+import java.io.*;
+public class PM implements Serializable{
     // store the Location in an array to accommodate multi-dimensional problem space
     public int id;
     public boolean active = false;
