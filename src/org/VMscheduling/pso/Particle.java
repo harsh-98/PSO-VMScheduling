@@ -2,22 +2,28 @@ package org.VMscheduling.pso;
 
 /* author: harsh jain */
 
-public class Particle {
+import java.lang.Cloneable;
+
+public class Particle implements Cloneable{
 	public boolean feasible =false;
-	private Velocity velocity;
-	private Location location;
+	public Velocity velocity;
+	public Location location;
 	public PM[] pmArray;
 	public int id;
-	public fitness = 0;
+	public double fitness = 0;
 	public Particle() {
 		super();
 	}
 
-	public Particle(int id, Velocity velocity, Location location, PM[] pmArray) {
+	public Particle clone()throws CloneNotSupportedException{  
+		return (Particle) super.clone();
+	}
+
+	public Particle(int id, boolean[] velocity, boolean[] location, PM[] pmArray) {
 		super();
 		this.feasible = true;
-		this.velocity = velocity;
-		this.location = location;
+		this.velocity = new Velocity(velocity);
+		this.location = new Location(location);
 		this.pmArray = pmArray;
 		this.id = id;
 	}
@@ -39,20 +45,20 @@ public class Particle {
 	}
 
 	public double calculateFitness(){
-		for(int i =0;i<location.length;i++){
-			double memmory = 0, cpu = 0;
-			if(location[i] == 1){
+		double memmory = 0, cpu = 0;
+		for(int i =0;i<location.size();i++){
+			if(location.getLoc()[i]){
 				memmory += pmArray[i].memmory;
 				cpu += pmArray[i].cpu;
-				return memmory+cpu;
 			}
 		}
+		return memmory+cpu;
 	}
 
 	public double[] getFit(){
-		double [] fit = new double[location.length];
-		for(int i = 0; i<location.length; i++){
-			fit[i] = 1-pmArray.get(i).memmory/pmArray.get(i).originalMemmory + 1-pmArray.get(i).cpu/pmArray.get(i).originalCpu;
+		double [] fit = new double[location.size()];
+		for(int i = 0; i<location.size(); i++){
+			fit[i] = 1-pmArray[i].memmory/pmArray[i].originalMemmory + 1-pmArray[i].cpu/pmArray[i].originalCpu;
 		}
 	return fit;
 	}
@@ -60,6 +66,7 @@ public class Particle {
 	public boolean update(boolean [] newLocation, PM[] pmArray){
 		this.location.setLoc(newLocation);
 		this.pmArray = pmArray;
+		return true;
 	}
 
 	public void print(){

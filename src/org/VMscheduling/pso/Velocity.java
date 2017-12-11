@@ -13,12 +13,13 @@ public class Velocity {
 		this.vel = vel;
 	}
 
-	public boolean[] getPos() {
-		return vel;
+	public boolean[] getVel() {
+		return this.vel;
 	}
 
-	public void setPos(boolean[] vel) {
+
+	public void setVel(boolean[] vel) {
 		this.vel = vel;
 	}
-	
+
 }

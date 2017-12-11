@@ -3,15 +3,15 @@ package org.VMscheduling.pso;
 import java.util.Vector;
 import java.util.*;
 
-public class PSOmain implements PSOConstants {
+public class PSOMain implements PSOConstants {
     private Vector<Particle> swarm = new Vector<Particle>();
     private Location gBestLocation;
     private double gBest; // memmory + cpu
-    private double gBestFit; // used memmory and cpu ratio w.r.t. original values
+    private double[] gBestFit; // used memmory and cpu ratio w.r.t. original values
     private Particle gSolution;
     private Vector<Particle> lSolution = new Vector<Particle>();
     private double[] pBest = new double[SWARM_SIZE];
-    private double[] pBestFit = new double[SWARM_SIZE];
+    private double[][] pBestFit = new double[SWARM_SIZE][NO_OF_PM];
     private Vector<Location> pBestLocation = new Vector<Location>();
     public Vector<VM> vmArray = new Vector<VM>();
 
@@ -22,8 +22,8 @@ public class PSOmain implements PSOConstants {
         for(int t = 0;t < MAX_ITERATION;t++){
             double minFit = 0;
             for(int i=0; i<SWARM_SIZE; i++) {
-                boolean [] velocity = swarm.get(i).velocity;
-                boolean [] location = swarm.get(i).location;
+                boolean [] velocity = swarm.get(i).velocity.getVel();
+                boolean [] location = swarm.get(i).location.getLoc();
 
                 //updating the velocity
                 boolean [] newVelocity = new boolean[NO_OF_PM];
@@ -32,48 +32,49 @@ public class PSOmain implements PSOConstants {
 
                     double randNum = rand.nextDouble();
                     if(randNum < probi[0]) newVelocity[j] = velocity[j];
-                    if(probi[0] <randNum && randNum < probi[1]) newVelocity[j] = pBestLocation[i][j] ^ location[j];
-                    if(probi[1] < randNum && randNum < probi[2]) newVelocity[j] = gBestLocation[j] ^ location[j];
-                    if(velocity[j] == pBestLocation[i][j] ^ location[j] && velocity[j] == gBestLocation[j] ^ location[j])
+                    if(probi[0] <randNum && randNum < probi[1]) newVelocity[j] = pBestLocation.get(i).getLoc()[j] ^ location[j];
+                    if(probi[1] < randNum && randNum < probi[2]) newVelocity[j] = gBestLocation.getLoc()[j] ^ location[j];
+                    if(velocity[j] == pBestLocation.get(i).getLoc()[j] ^ location[j] && velocity[j] == gBestLocation.getLoc()[j] ^ location[j])
                         newVelocity[j] = velocity[j];
-                    swarm.get(i).velocity = newVelocity;
+                    swarm.get(i).velocity.setVel(newVelocity);
                 }
 
 
                 //updating the location
                 boolean [] newLocation = new boolean[NO_OF_PM];
                 Set<Integer> ids = new HashSet<Integer>();
-                public PM[] pmArray = new PM[NO_OF_PM];
+                PM[] pmArray = new PM[NO_OF_PM];
                 for(int j=0; j<NO_OF_PM;j++){
-                    double [] probi = PSOUtility.ratio(swarm.get(i).getFit(), pBestFit[i][j], gBestFit[j]);
-                    if(swarm.get(i).velocity[j]) {newLocation[j] = location[j]; pmArray[j] = swarm.get(i).pmArray[j];}
-                    if(!swarm.get(i).velocity[j]){
+                    double [] probi = PSOUtility.ratio(swarm.get(i).getFit()[j], pBestFit[i][j], gBestFit[j]);
+                    if(swarm.get(i).velocity.getVel()[j]) {newLocation[j] = location[j]; pmArray[j] = swarm.get(i).pmArray[j];}
+                    if(!swarm.get(i).velocity.getVel()[j]){
                         double randNum = rand.nextDouble();
                         if(randNum < probi[0]) {newLocation[j] = location[j]; pmArray[j] = swarm.get(i).pmArray[j];}
-                        if(probi[0] <randNum && randNum < probi[1]) {newLocation[j] = pBestLocation[i][j];pmArray[j] = lSolution[i][j];}
-                        if(probi[1] < randNum && randNum < probi[2]) {newLocation[j] = gBestLocation[j];pmArray[j] = gSolution[j];}
+                        if(probi[0] <randNum && randNum < probi[1]) {newLocation[j] = pBestLocation.get(i).getLoc()[j];pmArray[j] = lSolution.get(i).pmArray[j];}
+                        if(probi[1] < randNum && randNum < probi[2]) {newLocation[j] = gBestLocation.getLoc()[j];pmArray[j] = gSolution.pmArray[j];}
                         boolean a=true;
-                        for(VM x : pmArray[j])
-                            if(ids.contains(x.id)){
+                        Vector<VM> vmVect = pmArray[j].vmArray;
+                        for(int f=0;f<vmVect.size();f++)
+                            if(ids.contains(vmVect.get(f).id)){
                                 a=false;
                                 pmArray[j] =null;
                                 newLocation[j] = false;
                                 break;
                             }
-                        for(VM x : pmArray[j])
+                        for(int f=0;f<vmVect.size();f++)
                             if(a){
-                                ids.add(x.id);
+                                ids.add(vmVect.get(f).id);
                             }
                     }
                 }
                 for (int j=0;j<NO_OF_VM ;j++ ) {
                     if(!ids.contains(j)){
-                        vm = new VM(j);
+                        VM vm = new VM(j);
                         boolean assigned =false;
                         loop:
                         for(int k=0; k< NO_OF_PM;k++){
                             if(newLocation[k]){
-                                pmArray[k].assign(vm);
+                                pmArray[k].assignVM(vm);
                                 assigned =true;
                                 break loop;
                             }
@@ -82,8 +83,8 @@ public class PSOmain implements PSOConstants {
                             for(int k=0;k<NO_OF_PM;k++){
                                 if(!newLocation[k]){
                                     newLocation[k] = true;
-                                    pmArray[k] =new PM();
-                                    pmArray[k].assign(vm);
+                                    pmArray[k] =new PM(k);
+                                    pmArray[k].assignVM(vm);
                                 }
                             }
                         }
@@ -93,17 +94,26 @@ public class PSOmain implements PSOConstants {
                 if(pBest[i]<swarm.get(i).calculateFitness()){
                     pBest[i] = swarm.get(i).calculateFitness();
                     pBestFit[i] = swarm.get(i).getFit();
-                    lSolution = (Particle) swarm.get(i).clone();
-                    pBestLocation.add(newLocation);
+                    try {
+                        lSolution.add((Particle) swarm.get(i).clone());
+                    } catch (CloneNotSupportedException e) {
+                        e.printStackTrace();
+                    }
+                    pBestLocation.add(new Location(newLocation));
                     if(pBest[i] < gBest){
                         gBest = pBest[i]; // min value
-                        gSolution = (Particle) swarm.get(i).clone();
-                        gBestLocation = swarm[i].location;
+                        try {
+                            gSolution = (Particle) swarm.get(i).clone();
+                        } catch (CloneNotSupportedException e) {
+                            e.printStackTrace();
+                        }
+                        gBestLocation = swarm.get(i).location;
                         gBestFit = pBestFit[i];
                     }
                 }
             }
-            System.out.println("Global opt"+gSolution.print());
+            System.out.println("Global opt");
+            gSolution.print();
         }
 
     }
@@ -112,7 +122,7 @@ public class PSOmain implements PSOConstants {
     // initialization
     public void initializeSwarm() {
         for(int i =0; i<NO_OF_VM;i++){
-            vmArray[i] = new VM(i);
+            vmArray.add(new VM(i));
         }
         Particle p;
         for(int i=0; i<SWARM_SIZE; i++) {
@@ -120,8 +130,8 @@ public class PSOmain implements PSOConstants {
             Random rand = new Random(SEED);
 
             // create the PM list
-            public PM[] pmArray = new PM[NO_OF_PM];
-            public boolean pmOnArray[NO_OF_PM];
+            PM[] pmArray = new PM[NO_OF_PM];
+            boolean pmOnArray[] =new boolean[NO_OF_PM];
             for(int j=0; j<NO_OF_PM; j++){
                 pmArray[j] = new PM(j);
             }
@@ -138,27 +148,30 @@ public class PSOmain implements PSOConstants {
                 pmOnArray[n] = true;
             }
 
-            Random rand = new Random(SEED);
-            public boolean velocity[NO_OF_PM];
+            boolean velocity[] = new boolean[NO_OF_PM];
             for(int j=0; j<NO_OF_PM; j++){
                 velocity[j] = rand.nextBoolean();
             }
 
             p = new Particle(i, velocity, pmOnArray, pmArray);
             swarm.add(p);
-            pBestLocation.add(pmOnArray);
+            pBestLocation.add(p.location);
         }
 
         // set the global min
-        var minFitness = Double.POSITIVE_INFINITY;
-        var minFitnessIndex = 0;
+        double minFitness = Double.POSITIVE_INFINITY;
+        int minFitnessIndex = 0;
         for(int i = 0; i<SWARM_SIZE; i++){
             pBest[i] = swarm.get(i).calculateFitness();
             pBestFit[i] = swarm.get(i).getFit();
 
             // creating a copy of the oject
             // https://stackoverflow.com/questions/2624165/how-to-copy-an-object-by-value-not-by-reference
-            lSolution = (Particle) swarm.get(i).clone();
+            try {
+                lSolution.add((Particle) swarm.get(i).clone());
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+            }
             if(minFitness > pBest[i]){
                 minFitness = pBest[i];
                 minFitnessIndex = i;
@@ -166,8 +179,12 @@ public class PSOmain implements PSOConstants {
             }
         }
         gBest = minFitness; // min value
-        gSolution = (Particle) swarm.get(minFitnessIndex).clone();
-        gBestLocation = swarm[minFitnessIndex].location;
+        try {
+            gSolution = (Particle) swarm.get(minFitnessIndex).clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        gBestLocation = swarm.get(minFitnessIndex).location;
     }
 
 }

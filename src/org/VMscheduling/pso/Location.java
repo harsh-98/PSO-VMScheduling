@@ -20,5 +20,8 @@ public class Location {
 	public void setLoc(boolean[] loc) {
 		this.loc = loc;
 	}
-	
+
+	public int size(){
+		return this.loc.length;
+	}
 }
