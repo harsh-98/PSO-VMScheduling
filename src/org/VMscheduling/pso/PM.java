@@ -6,7 +6,7 @@ package org.VMscheduling.pso;
 
 public class PM{
     // store the Location in an array to accommodate multi-dimensional problem space
-    private int id;
+    public int id;
     public active = false;
     public double originalMemmory = 1000;
     public double originalCpu = 1000;
@@ -23,9 +23,6 @@ public class PM{
 
 
 
-    public int getId(int id){
-        return id;
-    }
 
     public boolean assignVM(VM vm) {
         if(this.memmory - vm.memmory >= 0 && this.cpu - vm.cpu >= 0){

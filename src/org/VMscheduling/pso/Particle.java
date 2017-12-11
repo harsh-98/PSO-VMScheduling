@@ -57,4 +57,19 @@ public class Particle {
 	return fit;
 	}
 
+	public boolean update(boolean [] newLocation, PM[] pmArray){
+		this.location.setLoc(newLocation);
+		this.pmArray = pmArray;
+	}
+
+	public void print(){
+		for(PM x : this.pmArray){
+			System.out.print(x.id+":");
+			for(VM v : x.vmArray){
+				System.out.print(v.id+",");
+			}
+			System.out.println(" ");
+		}
+	}
+
 }

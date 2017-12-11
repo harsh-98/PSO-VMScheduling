@@ -18,7 +18,4 @@ public class VM{
         this.assigned = true;
     }
 
-    public int getId(int id){
-        return id;
-    }
 }
