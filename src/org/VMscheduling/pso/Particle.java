@@ -52,7 +52,7 @@ public class Particle implements Serializable{
 		return memmory+cpu;
 	}
 
-	public double[] getFit(){
+	public double[] getUtil(){
 		double [] fit = new double[location.size()];
 		for(int i = 0; i<location.size(); i++){
 			fit[i] = 1-pmArray[i].memmory/pmArray[i].originalMemmory + 1-pmArray[i].cpu/pmArray[i].originalCpu;

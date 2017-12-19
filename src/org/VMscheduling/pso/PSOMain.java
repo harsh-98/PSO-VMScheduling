@@ -6,14 +6,12 @@ import java.io.*;
 
 public class PSOMain implements PSOConstants {
     private Vector<Particle> swarm = new Vector<Particle>();
-    private Location gBestLocation;
     private double gBest; // memmory + cpu
-    private double[] gBestFit; // used memmory and cpu ratio w.r.t. original values
+    private double[] gBestUtil; // used memmory and cpu ratio w.r.t. original values
     private Particle gSolution;
     private Vector<Particle> lSolution = new Vector<Particle>();
     private double[] pBest = new double[SWARM_SIZE];
-    private double[][] pBestFit = new double[SWARM_SIZE][NO_OF_PM];
-    private Vector<Location> pBestLocation = new Vector<Location>();
+    private double[][] pBestUtil = new double[SWARM_SIZE][NO_OF_PM];
     public Vector<VM> vmArray = new Vector<VM>();
 
     public static Object deepClone(Object object) {
@@ -49,9 +47,9 @@ public class PSOMain implements PSOConstants {
 
                     double randNum = rand.nextDouble();
                     if(randNum < probi[0]) newVelocity[j] = velocity[j];
-                    if(probi[0] <randNum && randNum < probi[1]) newVelocity[j] = pBestLocation.get(i).getLoc()[j] ^ location[j];
-                    if(probi[1] < randNum && randNum < probi[2]) newVelocity[j] = gBestLocation.getLoc()[j] ^ location[j];
-                    if(velocity[j] == pBestLocation.get(i).getLoc()[j] ^ location[j] && velocity[j] == gBestLocation.getLoc()[j] ^ location[j])
+                    if(probi[0] <randNum && randNum < probi[1]) newVelocity[j] = lSolution.get(i).location.getLoc()[j] ^ location[j];
+                    if(probi[1] < randNum && randNum < probi[2]) newVelocity[j] = gSolution.location.getLoc()[j] ^ location[j];
+                    if(velocity[j] == lSolution.get(i).location.getLoc()[j] ^ location[j] && velocity[j] == gSolution.location.getLoc()[j] ^ location[j])
                         newVelocity[j] = velocity[j];
                     swarm.get(i).velocity.setVel(newVelocity);
                 }
@@ -62,12 +60,12 @@ public class PSOMain implements PSOConstants {
                 Set<Integer> ids = new HashSet<Integer>();
                 PM[] pmArray = new PM[NO_OF_PM];
                 for(int j=0; j<NO_OF_PM;j++){
-                    double [] probi = PSOUtility.ratio(swarm.get(i).getFit()[j], pBestFit[i][j], gBestFit[j]);
+                    double [] probi = PSOUtility.ratio(swarm.get(i).getUtil()[j], pBestUtil[i][j], gBestUtil[j]);
                     if(!swarm.get(i).velocity.getVel()[j]){
                         double randNum = rand.nextDouble();
                         if(randNum < probi[0]) {newLocation[j] = location[j]; pmArray[j] = swarm.get(i).pmArray[j];}
-                        else if(probi[0] <randNum && randNum < probi[1]) {newLocation[j] = pBestLocation.get(i).getLoc()[j];pmArray[j] = lSolution.get(i).pmArray[j];}
-                        else if(probi[1] < randNum) {newLocation[j] = gBestLocation.getLoc()[j];pmArray[j] = gSolution.pmArray[j];}
+                        else if(probi[0] <randNum && randNum < probi[1]) {newLocation[j] = lSolution.get(i).location.getLoc()[j];pmArray[j] = lSolution.get(i).pmArray[j];}
+                        else if(probi[1] < randNum) {newLocation[j] = gSolution.location.getLoc()[j];pmArray[j] = gSolution.pmArray[j];}
                         else {newLocation[j] = location[j]; pmArray[j] = swarm.get(i).pmArray[j];}
                     }else {newLocation[j] = location[j]; pmArray[j] = swarm.get(i).pmArray[j];}
                         boolean a=true;
@@ -110,20 +108,25 @@ public class PSOMain implements PSOConstants {
                 }
                 swarm.get(i).update(newLocation, pmArray);
 
+
+                System.out.println(pBest[i]);
+                System.out.println(swarm.get(i).calculateFitness());
                 if(pBest[i]<swarm.get(i).calculateFitness()){
                     pBest[i] = swarm.get(i).calculateFitness();
-                    pBestFit[i] = swarm.get(i).getFit();
+                    pBestUtil[i] = swarm.get(i).getUtil();
                         lSolution.set(i, (Particle) deepClone(swarm.get(i)));
 
-                    pBestLocation.set(i, new Location(newLocation));
                 }
+                  swarm.get(i).print();
+                System.out.println("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
+                lSolution.get(i).print();
+                System.out.println("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
             }
             for(int i=0; i<SWARM_SIZE; i++) {
                 if(pBest[i] < gBest){
                     gBest = pBest[i]; // min value
                         gSolution = (Particle) deepClone(swarm.get(i));
-                    gBestLocation = swarm.get(i).location;
-                    gBestFit = pBestFit[i];
+                    gBestUtil = pBestUtil[i];
                 }
             }
             //
@@ -170,17 +173,14 @@ public class PSOMain implements PSOConstants {
 
             p = new Particle(i, velocity, pmOnArray, pmArray);
             swarm.add(p);
-            pBestLocation.add(p.location);
-            //swarm.get(i).print();
 
         }
 
-        // set the global min
         double minFitness = Double.POSITIVE_INFINITY;
         int minFitnessIndex = 0;
         for(int i = 0; i<SWARM_SIZE; i++){
             pBest[i] = swarm.get(i).calculateFitness();
-            pBestFit[i] = swarm.get(i).getFit();
+            pBestUtil[i] = swarm.get(i).getUtil();
 
             // creating a copy of the oject
             // https://stackoverflow.com/questions/2624165/how-to-copy-an-object-by-value-not-by-reference
@@ -188,12 +188,11 @@ public class PSOMain implements PSOConstants {
             if(minFitness > pBest[i]){
                 minFitness = pBest[i];
                 minFitnessIndex = i;
-                gBestFit = pBestFit[i]; //max value
+                gBestUtil = pBestUtil[i]; //max value
             }
         }
         gBest = minFitness; // min value
             gSolution = (Particle) deepClone(swarm.get(minFitnessIndex));
-        gBestLocation = swarm.get(minFitnessIndex).location;
         System.out.println("xoxox");
     }
 
