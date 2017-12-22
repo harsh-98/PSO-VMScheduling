@@ -6,13 +6,15 @@ import java.io.*;
 
 public class PSOMain implements PSOConstants {
     private Vector<Particle> swarm = new Vector<Particle>();
-    private double gBest; // memmory + cpu
-    private double[] gBestUtil; // used memmory and cpu ratio w.r.t. original values
-    private Particle gSolution;
+    private double gBest; // memory + cpu
+    private double[] gBestUtil; // used memory and cpu ratio w.r.t. original values
+    public Particle gSolution;
     private Vector<Particle> lSolution = new Vector<Particle>();
     private double[] pBest = new double[SWARM_SIZE];
     private double[][] pBestUtil = new double[SWARM_SIZE][NO_OF_PM];
-    public Vector<VM> vmArray = new Vector<VM>();
+    public static Vector<VM> vmArray = new Vector<VM>();
+    public static double [] PMram = new double[NO_OF_PM];
+    public static double [] PMmips = new double[NO_OF_PM];
 
     public static Object deepClone(Object object) {
         try {
@@ -78,7 +80,7 @@ public class PSOMain implements PSOConstants {
                         for(int f=0;f<vmVect.size();f++){
                             if(ids.contains(vmVect.get(f).id)){
                                 a=false;
-                                pmArray[j] = new PM(j);
+                                pmArray[j] = new PM(j,PMram[j],PMmips[j]);
                                 newLocation[j] = false;
                                 break;
                             }}
@@ -90,12 +92,12 @@ public class PSOMain implements PSOConstants {
                 }
                 for (int j=0;j<NO_OF_VM ;j++ ) {
                     if(!ids.contains(j)){
-                        VM vm = new VM(j);
+                        //VM vm = new VM(j);
                         boolean assigned =false;
                         LOOP:
                         for(int k=0; k< NO_OF_PM;k++){
                             if(newLocation[k]){
-                                assigned =pmArray[k].assignVM(vm);
+                                assigned =pmArray[k].assignVM(vmArray.get(j));
                                 if(assigned)
                                     break LOOP;
                             }
@@ -104,7 +106,7 @@ public class PSOMain implements PSOConstants {
                             for(int k=0;k<NO_OF_PM;k++){
                                 if(!newLocation[k]){
                                     newLocation[k] = true;
-                                    pmArray[k].assignVM(vm);
+                                    pmArray[k].assignVM(vmArray.get(j));
                                     break;
                                 }
                             }
@@ -127,36 +129,33 @@ public class PSOMain implements PSOConstants {
                     gBestUtil = pBestUtil[i];
                 }
             }
-            System.out.println("Global opt: Iteration "+t);
-            gSolution.print();
+            //System.out.println("Global opt: Iteration "+t);
         }
+            gSolution.print();
 
     }
 
 
     // initialization
     public void initializeSwarm() {
-        for(int i =0; i<NO_OF_VM;i++){
-            vmArray.add(new VM(i));
-        }
         Particle p;
         Random rand = new Random(SEED);
         for(int i=0; i<SWARM_SIZE; i++) {
-            VM vm;
+            //VM vm;
 
             // create the PM list
             PM[] pmArray = new PM[NO_OF_PM];
             boolean pmOnArray[] =new boolean[NO_OF_PM];
             for(int j=0; j<NO_OF_PM; j++){
-                pmArray[j] = new PM(j);
+                pmArray[j] = new PM(j,PMram[j],PMmips[j]);
             }
 
             // assign the VM to the PM
             ASSIGN:
             for(int j=0; j<NO_OF_VM; j++){
-                vm = new VM(j);
+                //vm = new VM(j);
                 int  n = rand.nextInt(NO_OF_PM);
-                if(!pmArray[n].assignVM(vm)){
+                if(!pmArray[n].assignVM(vmArray.get(j))){
                     j--;
                     continue ASSIGN;
                 }
@@ -192,8 +191,6 @@ public class PSOMain implements PSOConstants {
         }
         gBest = minFitness; // min value
             gSolution = (Particle) deepClone(swarm.get(minFitnessIndex));
-        gSolution.print();
-        System.out.println("xoxox");
     }
 
 }

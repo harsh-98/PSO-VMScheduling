@@ -10,6 +10,6 @@ The parameters Swarm size, no of iterations, no of servers and no of virtual mac
 
 ## LICENSE 
 
-Shush is registered under MIT License.
+This is registered under MIT License.
 
 For more information, see [license](https://harshjain.mit-license.org/).

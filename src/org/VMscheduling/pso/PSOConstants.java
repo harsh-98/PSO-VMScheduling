@@ -9,8 +9,8 @@ public interface PSOConstants {
 	int SWARM_SIZE = 50;
 	int MAX_ITERATION = 10;
 	int NO_OF_PM = 300;
-	int POP = 100;
 	int NO_OF_VM = 1000;
 	int SEED = 1;
-	Double MIN =20.0;
+	int NO_OF_CLOUDLETS = 1000;
+	Double MIN = 20.0;
 }

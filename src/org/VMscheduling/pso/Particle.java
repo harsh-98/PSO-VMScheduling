@@ -42,21 +42,21 @@ public class Particle implements Serializable{
 	}
 
 	public double calculateFitness(){
-		double memmory = 0, cpu = 0;
+		double memory = 0, cpu = 0;
 		for(int i =0;i<location.size();i++){
 			if(location.getLoc()[i]){
-				memmory += pmArray[i].memmory;
+				memory += pmArray[i].memory;
 				cpu += pmArray[i].cpu;
 			}
 		}
-		return memmory+cpu;
+		return memory+cpu;
 	}
 
 	public double[] getUtil(){
 		double [] fit = new double[location.size()];
 		for(int i = 0; i<location.size(); i++){
-			fit[i] = 1-pmArray[i].memmory/pmArray[i].originalMemmory + 1-pmArray[i].cpu/pmArray[i].originalCpu;
-			if(fit[i] == 0)fit[i] = PSOConstants.MIN/(pmArray[i].originalMemmory+pmArray[i].originalCpu);
+			fit[i] = 1-pmArray[i].memory/pmArray[i].originalmemory + 1-pmArray[i].cpu/pmArray[i].originalCpu;
+			if(fit[i] == 0)fit[i] = PSOConstants.MIN/(pmArray[i].originalmemory+pmArray[i].originalCpu);
 		}
 	return fit;
 	}
