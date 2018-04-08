@@ -69,11 +69,11 @@ public class Particle implements Serializable{
 
 	public void print(){
 		for(PM x : this.pmArray){
-			System.out.print(x.id+":");
+			System.out.print(String.format("%d (Pcpu%d, Pram:%d):",(int)x.id, (int)x.cpu, (int)x.memory));
 			for(VM v : x.vmArray){
-				System.out.print(v.id+",");
+				System.out.print(String.format("%d (Vcpu%d, Vram:%d),",(int)v.id, (int)v.cpu, (int)v.memory));
 			}
-			System.out.println(" ");
+			System.out.println("");
 		}
 	}
 

@@ -4,18 +4,29 @@ import java.util.Vector;
 import java.util.*;
 import java.io.*;
 
-public class PSOMain implements PSOConstants {
+public class PSOMain {
     private Vector<Particle> swarm = new Vector<Particle>();
     private double gBest; // memory + cpu
     private double[] gBestUtil; // used memory and cpu ratio w.r.t. original values
     public Particle gSolution;
+    public int t=PSOConstants.NO_OF_PM;
     private Vector<Particle> lSolution = new Vector<Particle>();
-    private double[] pBest = new double[SWARM_SIZE];
-    private double[][] pBestUtil = new double[SWARM_SIZE][NO_OF_PM];
+    private double[] pBest = new double[PSOConstants.SWARM_SIZE];
+    private double[][] pBestUtil = new double[PSOConstants.SWARM_SIZE][PSOConstants.NO_OF_PM];
     public static Vector<VM> vmArray = new Vector<VM>();
-    public static double [] PMram = new double[NO_OF_PM];
-    public static double [] PMmips = new double[NO_OF_PM];
+    public double [] PMram;
+    public double [] PMmips;
 
+
+    public PSOMain(){
+        //System.out.println(PSOConstants.NO_OF_PM);
+        //System.out.println("hi"+t+" "+PMmips.length);
+        PMmips = new double[PSOConstants.NO_OF_PM];
+        PMram = new double[PSOConstants.NO_OF_PM];
+        System.out.println(PSOConstants.NO_OF_PM);
+        System.out.println(PSOConstants.NO_OF_VM);
+
+    }
     public static Object deepClone(Object object) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -34,17 +45,17 @@ public class PSOMain implements PSOConstants {
     public void execute() {
         initializeSwarm();
 
-        Random rand = new Random(SEED);
-        for(int t = 0;t < MAX_ITERATION;t++){
+        Random rand = new Random(PSOConstants.SEED);
+        for(int t = 0;t < PSOConstants.MAX_ITERATION;t++){
             double minFit = 0;
-            for(int i=0; i<SWARM_SIZE; i++) {
+            for(int i=0; i<PSOConstants.SWARM_SIZE; i++) {
 
                 boolean [] velocity = swarm.get(i).velocity.getVel();
                 boolean [] location = swarm.get(i).location.getLoc();
 
                 //updating the velocity
-                boolean [] newVelocity = new boolean[NO_OF_PM];
-                for(int j=0; j<NO_OF_PM;j++){
+                boolean [] newVelocity = new boolean[PSOConstants.NO_OF_PM];
+                for(int j=0; j<PSOConstants.NO_OF_PM;j++){
                     double [] probi = PSOUtility.ratio(1/swarm.get(i).calculateFitness(), 1/pBest[i], 1/gBest);
 
                     double randNum = rand.nextDouble();
@@ -58,10 +69,10 @@ public class PSOMain implements PSOConstants {
 
 
                 //updating the location
-                boolean [] newLocation = new boolean[NO_OF_PM];
+                boolean [] newLocation = new boolean[PSOConstants.NO_OF_PM];
                 Set<Integer> ids = new HashSet<Integer>();
-                PM[] pmArray = new PM[NO_OF_PM];
-                for(int j=0; j<NO_OF_PM;j++){
+                PM[] pmArray = new PM[PSOConstants.NO_OF_PM];
+                for(int j=0; j<PSOConstants.NO_OF_PM;j++){
                     double [] probi = PSOUtility.ratio(swarm.get(i).getUtil()[j], pBestUtil[i][j], gBestUtil[j]);
                     if(!swarm.get(i).velocity.getVel()[j]){
                         double randNum = rand.nextDouble();
@@ -90,12 +101,12 @@ public class PSOMain implements PSOConstants {
                             }
                         }
                 }
-                for (int j=0;j<NO_OF_VM ;j++ ) {
+                for (int j=0;j<PSOConstants.NO_OF_VM ;j++ ) {
                     if(!ids.contains(j)){
                         //VM vm = new VM(j);
                         boolean assigned =false;
                         LOOP:
-                        for(int k=0; k< NO_OF_PM;k++){
+                        for(int k=0; k< PSOConstants.NO_OF_PM;k++){
                             if(newLocation[k]){
                                 assigned =pmArray[k].assignVM(vmArray.get(j));
                                 if(assigned)
@@ -103,7 +114,7 @@ public class PSOMain implements PSOConstants {
                             }
                         }
                         if(!assigned){
-                            for(int k=0;k<NO_OF_PM;k++){
+                            for(int k=0;k<PSOConstants.NO_OF_PM;k++){
                                 if(!newLocation[k]){
                                     newLocation[k] = true;
                                     pmArray[k].assignVM(vmArray.get(j));
@@ -122,7 +133,7 @@ public class PSOMain implements PSOConstants {
 
                 }
             }
-            for(int i=0; i<SWARM_SIZE; i++) {
+            for(int i=0; i<PSOConstants.SWARM_SIZE; i++) {
                 if(pBest[i] < gBest){
                     gBest = pBest[i]; // min value
                         gSolution = (Particle) deepClone(swarm.get(i));
@@ -139,31 +150,33 @@ public class PSOMain implements PSOConstants {
     // initialization
     public void initializeSwarm() {
         Particle p;
-        Random rand = new Random(SEED);
-        for(int i=0; i<SWARM_SIZE; i++) {
+        Random rand = new Random(PSOConstants.SEED);
+        for(int i=0; i<PSOConstants.SWARM_SIZE; i++) {
             //VM vm;
 
             // create the PM list
-            PM[] pmArray = new PM[NO_OF_PM];
-            boolean pmOnArray[] =new boolean[NO_OF_PM];
-            for(int j=0; j<NO_OF_PM; j++){
+            PM[] pmArray = new PM[PSOConstants.NO_OF_PM];
+            boolean pmOnArray[] =new boolean[PSOConstants.NO_OF_PM];
+            for(int j=0; j<PSOConstants.NO_OF_PM; j++){
                 pmArray[j] = new PM(j,PMram[j],PMmips[j]);
+                // System.out.println("PM" + PMmips[j] +" "+ PMram[j]);
             }
 
             // assign the VM to the PM
             ASSIGN:
-            for(int j=0; j<NO_OF_VM; j++){
+            for(int j=0; j<PSOConstants.NO_OF_VM; j++){
                 //vm = new VM(j);
-                int  n = rand.nextInt(NO_OF_PM);
+                int  n = rand.nextInt(PSOConstants.NO_OF_PM);
                 if(!pmArray[n].assignVM(vmArray.get(j))){
                     j--;
                     continue ASSIGN;
                 }
                 pmOnArray[n] = true;
+                // System.out.println("VM" + vmArray.get(j).memory +" "+ vmArray.get(j).cpu);
             }
 
-            boolean velocity[] = new boolean[NO_OF_PM];
-            for(int j=0; j<NO_OF_PM; j++){
+            boolean velocity[] = new boolean[PSOConstants.NO_OF_PM];
+            for(int j=0; j<PSOConstants.NO_OF_PM; j++){
                 velocity[j] = rand.nextBoolean();
             }
 
@@ -176,7 +189,7 @@ public class PSOMain implements PSOConstants {
         // set the global min
         double minFitness = Double.POSITIVE_INFINITY;
         int minFitnessIndex = 0;
-        for(int i = 0; i<SWARM_SIZE; i++){
+        for(int i = 0; i<PSOConstants.SWARM_SIZE; i++){
             pBest[i] = swarm.get(i).calculateFitness();
             pBestUtil[i] = swarm.get(i).getUtil();
 
