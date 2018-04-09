@@ -23,8 +23,8 @@ public class PSOMain {
         //System.out.println("hi"+t+" "+PMmips.length);
         PMmips = new double[PSOConstants.NO_OF_PM];
         PMram = new double[PSOConstants.NO_OF_PM];
-        System.out.println(PSOConstants.NO_OF_PM);
-        System.out.println(PSOConstants.NO_OF_VM);
+        System.err.println("No of pm:"+PSOConstants.NO_OF_PM);
+        System.err.println("No of vm:"+PSOConstants.NO_OF_VM);
 
     }
     public static Object deepClone(Object object) {
@@ -141,8 +141,13 @@ public class PSOMain {
                 }
             }
             //System.out.println("Global opt: Iteration "+t);
+            int temporary=t+1;
+            try {
+            gSolution.print("data"+ temporary +".csv");
+            } catch (FileNotFoundException e){
+                e.printStackTrace();
+            }
         }
-            gSolution.print();
 
     }
 
@@ -204,6 +209,11 @@ public class PSOMain {
         }
         gBest = minFitness; // min value
             gSolution = (Particle) deepClone(swarm.get(minFitnessIndex));
+            try {
+            gSolution.print("data0.csv");
+            } catch (FileNotFoundException e){
+                e.printStackTrace();
+            }
     }
 
 }

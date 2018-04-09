@@ -67,14 +67,18 @@ public class Particle implements Serializable{
 		return true;
 	}
 
-	public void print(){
+	public void print(String filename) throws FileNotFoundException {
+  PrintWriter pw = new PrintWriter("data/"+filename);
+  pw.print("PM,VM\n");
 		for(PM x : this.pmArray){
-			System.out.print(String.format("%d (Pcpu%d, Pram:%d):",(int)x.id, (int)x.cpu, (int)x.memory));
+			// System.out.print(String.format("%d (Pcpu%d, Pram:%d):",(int)x.id, (int)x.cpu, (int)x.memory));
 			for(VM v : x.vmArray){
-				System.out.print(String.format("%d (Vcpu%d, Vram:%d),",(int)v.id, (int)v.cpu, (int)v.memory));
+			pw.print(x.id+","+v.id+"\n");
+				// System.out.print(String.format("%d (Vcpu%d, Vram:%d),",(int)v.id, (int)v.cpu, (int)v.memory));
 			}
-			System.out.println("");
 		}
+  pw.close();
+			// System.out.println("");
 	}
 
 }
