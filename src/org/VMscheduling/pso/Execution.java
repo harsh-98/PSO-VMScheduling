@@ -10,8 +10,8 @@ public class Execution {
         PSOMain psomain = new PSOMain();
         Random rand = new Random(PSOConstants.SEED);
         for(int i=0;i < PSOConstants.NO_OF_PM; i++){
-            int ram = rand.nextInt(51)*10 + 500;
-            int cpu = rand.nextInt(51)*10 + 500;
+            int ram = rand.nextInt(41)*10 + 300;
+            int cpu = rand.nextInt(41)*10 + 300;
             psomain.PMram[i] = ram;
             psomain.PMmips[i] = cpu;
             // System.out.println(String.format("%d (Pcpu%d, Pram:%d):", i, cpu, ram));

@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 import pandas as pd
 import numpy as np
+import time
 from matplotlib.animation import FuncAnimation
 fig, ax = plt.subplots()
 fig.set_tight_layout(True)
@@ -11,6 +12,8 @@ fig.set_tight_layout(True)
 
 def update(i):
     print(i)
+    if i==21:
+        time.sleep(3000)
     data = pd.read_csv("data/data" +str(i) +".csv")
     lab = 'timestep {0}'.format(i)
     plt.clf()
@@ -18,7 +21,7 @@ def update(i):
             label=lab)
 
 if __name__ == "__main__":
-    anim = FuncAnimation(fig, update, frames=np.arange(0, 10), interval=100)
+    anim = FuncAnimation(fig, update, frames=np.arange(0, 22), interval=100)
     plt.xlabel("Virtual machines")
     plt.ylabel("Physical machines")
     plt.legend(loc=2)
